@@ -23,16 +23,14 @@ def inp(ch):
         for i in range(0,65535):
             sc(ip, i)
     elif ch == 2:
-        port_list = [21,22,58,80,400,443]
+        port_list = [21,22,58,80,110,443]
         for i in port_list:
             sc(ip, i)
     elif ch == 3:
         inp_p = input("Enter Port Number: ")
         sc(ip, int(inp_p))
     else:
-        print("Invalid Input")
-    '''else:
-        print("Host is Down")'''    
+        print("Invalid Input")  
      
 
 # Start syn_scan
