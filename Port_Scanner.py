@@ -16,21 +16,32 @@ from time import sleep, time
 #Resolving host and select scan type
 
 def inp(ch):
-    host_inp = input("Enter Host Name/ IP Address\n")
-    ip = socket.gethostbyname(host_inp)
-    print("--> Resolved IP Address",ip)
-    if ch == 1:
-        for i in range(0,65535):
-            sc(ip, i)
-    elif ch == 2:
-        port_list = [21,22,58,80,110,443]
-        for i in port_list:
-            sc(ip, i)
-    elif ch == 3:
-        inp_p = input("Enter Port Number: ")
-        sc(ip, int(inp_p))
-    else:
-        print("Invalid Input")  
+    try:
+        host_inp = input("Enter Host Name/ IP Address\n")
+        ip = socket.gethostbyname(host_inp)
+        print("--> Resolved IP Address",ip)
+        if ch == 1:
+            for i in range(0,65535):
+                sc(ip, i)
+        elif ch == 2:
+            port_list = [21,22,58,80,110,443]
+            for i in port_list:
+                sc(ip, i)
+        elif ch == 3:
+            inp_p = input("Enter Port Number: ")
+            sc(ip, int(inp_p))
+        '''else:
+            print("Invalid Input")'''
+    except socket.gaierror:
+        print("-->Invalid Host Name")
+        print("-->Enter a valid Host Name")
+        main()
+    except KeyboardInterrupt:
+        print("-->Keyboard interruption")
+        print("-->Exiting")
+        sleep(2)
+        sys.exit(0)
+
      
 
 # Start syn_scan
@@ -40,7 +51,7 @@ def sc(ip, port):
     open_ports = []
     sport = RandShort()
     pkt = sr1(IP(dst=ip)/TCP(sport = sport, dport=port, flags="S"),timeout=5, verbose=0)
-    print("Port Number: " + str(port))
+    print("[*] Port Number: " + str(port))
     try:
         if pkt != None:
             if pkt.haslayer(TCP):
@@ -68,18 +79,31 @@ def sc(ip, port):
         print("_-"*25)
     except KeyboardInterrupt:
         print("-->Keyboard Interruption\n-->Good Bye")
+        sleep(2)
+        sys.exit(0)
+    except ConnectionResetError:
+        print("Connection Reset by Host")
+        print("Adding Delay")
+        sleep(5)
+        
+
     
     print(open_ports)
 
  # Grabing Banner   
 def banner(ip, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn = s.connect_ex((ip, port))
-    if conn == 0:
-        service = s.recv(1024).decode()
-        print("Service: ",service)        
-        s.settimeout(5)
-        s.close()
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        conn = s.connect_ex((ip, port))
+        if conn == 0:
+            service = s.recv(1024).decode()
+            print("Service: ",service)        
+            s.settimeout(5)
+            s.close()
+    except KeyboardInterrupt:
+        print("Keyboard interruption")
+        sleep(2)
+        sys.exit(0)
     
 # Defining Main Function
 def main():
